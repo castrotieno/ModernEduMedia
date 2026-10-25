@@ -1,4 +1,4 @@
--- ModernEduMedia FINAL SAFE UPGRADE — run entire file in Supabase SQL Editor
+-- ModernEduMedia v5 SAFE UPGRADE — run entire file in Supabase SQL Editor
 create extension if not exists "pgcrypto";
 
 do $$ begin
@@ -23,20 +23,76 @@ create table if not exists public.blogs(id uuid primary key default gen_random_u
 create table if not exists public.site_settings(key text primary key,value text default '',updated_at timestamptz default now());
 create table if not exists public.contact_messages(id uuid primary key default gen_random_uuid(),name text not null,email text not null,subject text,message text not null,created_at timestamptz default now());
 
-do $$ begin
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='class_id') then alter table public.profiles add column class_id uuid references public.classes(id) on delete set null; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='admission_no') then alter table public.profiles add column admission_no text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='phone') then alter table public.profiles add column phone text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='classes' and column_name='description') then alter table public.classes add column description text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='subjects' and column_name='teacher_id') then alter table public.subjects add column teacher_id uuid references public.profiles(id) on delete set null; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='subjects' and column_name='description') then alter table public.subjects add column description text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='storage_path') then alter table public.resources add column storage_path text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='file_name') then alter table public.resources add column file_name text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='file_size') then alter table public.resources add column file_size bigint; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='download_count') then alter table public.resources add column download_count integer default 0; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='assignments' and column_name='attachment_url') then alter table public.assignments add column attachment_url text; end if;
-if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='submissions' and column_name='text_answer') then alter table public.submissions add column text_answer text; end if;
-end $$;
+-- ===== Column repair (v5): older databases may hold tables created BEFORE some columns existed. =====
+-- "create table if not exists" never adds columns to an existing table, which caused errors such as
+--   Could not find the 'feedback' column of 'submissions' in the schema cache
+--   Could not find the 'subject' column of 'contact_messages' in the schema cache
+-- Every column the app uses is therefore added here if missing (safe to re-run).
+alter table public.profiles add column if not exists full_name text default '';
+alter table public.profiles add column if not exists role public.user_role default 'student';
+alter table public.profiles add column if not exists avatar_url text;
+alter table public.profiles add column if not exists created_at timestamptz default now();
+alter table public.profiles add column if not exists class_id uuid references public.classes(id) on delete set null;
+alter table public.profiles add column if not exists admission_no text;
+alter table public.profiles add column if not exists phone text;
+alter table public.classes add column if not exists academic_year text;
+alter table public.classes add column if not exists description text;
+alter table public.classes add column if not exists created_at timestamptz default now();
+alter table public.subjects add column if not exists class_id uuid references public.classes(id) on delete cascade;
+alter table public.subjects add column if not exists teacher_id uuid references public.profiles(id) on delete set null;
+alter table public.subjects add column if not exists description text;
+alter table public.subjects add column if not exists created_at timestamptz default now();
+alter table public.enrollments add column if not exists class_id uuid references public.classes(id) on delete set null;
+alter table public.enrollments add column if not exists enrolled_at timestamptz default now();
+alter table public.resources add column if not exists description text default '';
+alter table public.resources add column if not exists type public.resource_type default 'document';
+alter table public.resources add column if not exists subject_id uuid references public.subjects(id) on delete cascade;
+alter table public.resources add column if not exists uploaded_by uuid references public.profiles(id) on delete cascade;
+alter table public.resources add column if not exists created_at timestamptz default now();
+alter table public.resources add column if not exists storage_path text;
+alter table public.resources add column if not exists file_name text;
+alter table public.resources add column if not exists file_size bigint;
+alter table public.resources add column if not exists download_count integer default 0;
+alter table public.assignments add column if not exists instructions text default '';
+alter table public.assignments add column if not exists type public.assessment_type default 'Assignment';
+alter table public.assignments add column if not exists subject_id uuid references public.subjects(id) on delete cascade;
+alter table public.assignments add column if not exists max_score numeric default 100;
+alter table public.assignments add column if not exists due_date timestamptz;
+alter table public.assignments add column if not exists created_by uuid references public.profiles(id) on delete cascade;
+alter table public.assignments add column if not exists created_at timestamptz default now();
+alter table public.assignments add column if not exists attachment_url text;
+alter table public.submissions add column if not exists text_answer text;
+alter table public.submissions add column if not exists attachment_url text;
+alter table public.submissions add column if not exists score numeric;
+alter table public.submissions add column if not exists feedback text;
+alter table public.submissions add column if not exists status public.submission_status default 'pending';
+alter table public.submissions add column if not exists submitted_at timestamptz default now();
+alter table public.quizzes add column if not exists description text default '';
+alter table public.quizzes add column if not exists subject_id uuid references public.subjects(id) on delete cascade;
+alter table public.quizzes add column if not exists time_limit_minutes integer default 30;
+alter table public.quizzes add column if not exists max_attempts integer default 1;
+alter table public.quizzes add column if not exists is_published boolean default false;
+alter table public.quizzes add column if not exists created_by uuid references public.profiles(id) on delete cascade;
+alter table public.quizzes add column if not exists created_at timestamptz default now();
+alter table public.quiz_questions add column if not exists question_type public.question_type default 'multiple_choice';
+alter table public.quiz_questions add column if not exists options jsonb default '[]'::jsonb;
+alter table public.quiz_questions add column if not exists marks numeric default 1;
+alter table public.quiz_questions add column if not exists explanation text;
+alter table public.quiz_questions add column if not exists created_at timestamptz default now();
+alter table public.quiz_attempts add column if not exists answers jsonb default '{}'::jsonb;
+alter table public.quiz_attempts add column if not exists score numeric default 0;
+alter table public.quiz_attempts add column if not exists total_marks numeric default 0;
+alter table public.quiz_attempts add column if not exists percentage numeric default 0;
+alter table public.quiz_attempts add column if not exists submitted_at timestamptz default now();
+alter table public.blogs add column if not exists cover_image text;
+alter table public.blogs add column if not exists category text;
+alter table public.blogs add column if not exists author_id uuid references public.profiles(id) on delete cascade;
+alter table public.blogs add column if not exists is_published boolean default false;
+alter table public.blogs add column if not exists created_at timestamptz default now();
+alter table public.site_settings add column if not exists value text default '';
+alter table public.site_settings add column if not exists updated_at timestamptz default now();
+alter table public.contact_messages add column if not exists subject text;
+alter table public.contact_messages add column if not exists created_at timestamptz default now();
 
 create index if not exists profiles_class_idx on public.profiles(class_id);
 create index if not exists subjects_class_idx on public.subjects(class_id);
@@ -126,7 +182,7 @@ create policy "settings read" on public.site_settings for select using(true);
 create policy "settings admin write" on public.site_settings for all to authenticated using(public.is_admin()) with check(public.is_admin());
 
 drop policy if exists "contact insert" on public.contact_messages; drop policy if exists "contact admin read" on public.contact_messages;
-create policy "contact insert" on public.contact_messages for insert to anon,authenticated with check(true);
+create policy "contact insert" on public.contact_messages for insert to anon,authenticated with check(char_length(name)<=200 and char_length(email)<=320 and char_length(message)<=5000 and coalesce(char_length(subject),0)<=300);
 create policy "contact admin read" on public.contact_messages for select to authenticated using(public.is_admin());
 
 insert into storage.buckets(id,name,public) values('learning-materials','learning-materials',true) on conflict(id) do nothing;
@@ -201,3 +257,113 @@ alter table public.quiz_attempts drop constraint if exists quiz_attempts_quiz_id
 alter table public.quiz_attempts add constraint quiz_attempts_quiz_id_fkey foreign key(quiz_id) references public.quizzes(id) on delete cascade;
 alter table public.quiz_attempts drop constraint if exists quiz_attempts_student_id_fkey;
 alter table public.quiz_attempts add constraint quiz_attempts_student_id_fkey foreign key(student_id) references public.profiles(id) on delete cascade;
+
+-- ===== v5: Live Classes + discussion forums (safe to re-run) =====
+create table if not exists public.live_classes(
+ id uuid primary key default gen_random_uuid(),
+ title text not null,
+ description text default '',
+ subject_id uuid references public.subjects(id) on delete cascade,
+ teacher_id uuid references public.profiles(id) on delete set null,
+ starts_at timestamptz not null default now(),
+ duration_minutes integer default 60,
+ provider text default 'jitsi' check(provider in ('jitsi','external')),
+ meeting_link text,
+ room_name text unique default ('mem-'||replace(gen_random_uuid()::text,'-','')),
+ status text default 'scheduled' check(status in ('scheduled','live','ended','cancelled')),
+ recording_url text,
+ started_at timestamptz,
+ ended_at timestamptz,
+ created_at timestamptz default now());
+create table if not exists public.live_attendance(
+ live_class_id uuid not null references public.live_classes(id) on delete cascade,
+ user_id uuid not null references public.profiles(id) on delete cascade,
+ joined_at timestamptz default now(),
+ primary key(live_class_id,user_id));
+create table if not exists public.discussion_threads(
+ id uuid primary key default gen_random_uuid(),
+ subject_id uuid references public.subjects(id) on delete cascade,
+ live_class_id uuid references public.live_classes(id) on delete cascade,
+ title text not null check(char_length(title) between 1 and 200),
+ body text default '' check(char_length(body)<=4000),
+ author_id uuid not null references public.profiles(id) on delete cascade,
+ kind text default 'topic' check(kind in ('topic','class_chat')),
+ is_pinned boolean default false,
+ is_locked boolean default false,
+ created_at timestamptz default now(),
+ last_activity_at timestamptz default now());
+create table if not exists public.discussion_posts(
+ id uuid primary key default gen_random_uuid(),
+ thread_id uuid not null references public.discussion_threads(id) on delete cascade,
+ author_id uuid not null references public.profiles(id) on delete cascade,
+ body text not null check(char_length(body) between 1 and 4000),
+ created_at timestamptz default now());
+
+create index if not exists live_classes_subject_idx on public.live_classes(subject_id,starts_at);
+create index if not exists live_classes_teacher_idx on public.live_classes(teacher_id);
+create index if not exists threads_subject_idx on public.discussion_threads(subject_id,last_activity_at desc);
+create index if not exists threads_live_idx on public.discussion_threads(live_class_id);
+create index if not exists posts_thread_idx on public.discussion_posts(thread_id,created_at);
+
+-- true for the admin, or for the teacher assigned to that subject (a null subject = whole school, admin only)
+create or replace function public.moderates_subject(target uuid) returns boolean language sql stable security definer set search_path=public as $$
+ select public.is_admin() or (target is not null and exists(select 1 from public.subjects s where s.id=target and s.teacher_id=auth.uid())) $$;
+
+alter table public.live_classes enable row level security;
+alter table public.live_attendance enable row level security;
+alter table public.discussion_threads enable row level security;
+alter table public.discussion_posts enable row level security;
+
+drop policy if exists "live read" on public.live_classes; drop policy if exists "live teacher insert" on public.live_classes; drop policy if exists "live owner update" on public.live_classes; drop policy if exists "live owner delete" on public.live_classes;
+create policy "live read" on public.live_classes for select to authenticated using(subject_id is null or public.can_access_subject(subject_id));
+create policy "live teacher insert" on public.live_classes for insert to authenticated with check(public.is_teacher() and teacher_id=auth.uid() and public.moderates_subject(subject_id));
+create policy "live owner update" on public.live_classes for update to authenticated using(teacher_id=auth.uid() or public.is_admin()) with check(teacher_id=auth.uid() or public.is_admin());
+create policy "live owner delete" on public.live_classes for delete to authenticated using(teacher_id=auth.uid() or public.is_admin());
+
+drop policy if exists "attendance read" on public.live_attendance; drop policy if exists "attendance insert own" on public.live_attendance; drop policy if exists "attendance admin delete" on public.live_attendance;
+create policy "attendance read" on public.live_attendance for select to authenticated using(user_id=auth.uid() or exists(select 1 from public.live_classes c where c.id=live_class_id and (c.teacher_id=auth.uid() or public.is_admin())));
+create policy "attendance insert own" on public.live_attendance for insert to authenticated with check(user_id=auth.uid() and exists(select 1 from public.live_classes c where c.id=live_class_id));
+create policy "attendance admin delete" on public.live_attendance for delete to authenticated using(public.is_admin());
+
+drop policy if exists "threads read" on public.discussion_threads; drop policy if exists "threads insert" on public.discussion_threads; drop policy if exists "threads update" on public.discussion_threads; drop policy if exists "threads delete" on public.discussion_threads;
+create policy "threads read" on public.discussion_threads for select to authenticated using(subject_id is null or public.can_access_subject(subject_id));
+create policy "threads insert" on public.discussion_threads for insert to authenticated with check(author_id=auth.uid() and is_pinned=false and is_locked=false and ((subject_id is null and public.is_admin()) or (subject_id is not null and public.can_access_subject(subject_id))));
+create policy "threads update" on public.discussion_threads for update to authenticated using(author_id=auth.uid() or public.moderates_subject(subject_id)) with check(author_id=auth.uid() or public.moderates_subject(subject_id));
+create policy "threads delete" on public.discussion_threads for delete to authenticated using(author_id=auth.uid() or public.moderates_subject(subject_id));
+
+-- only moderators may pin / lock; nobody may move a thread to another subject or author
+create or replace function public.guard_thread() returns trigger language plpgsql security definer set search_path=public as $$
+begin
+ if new.author_id is distinct from old.author_id or new.subject_id is distinct from old.subject_id or new.live_class_id is distinct from old.live_class_id then raise exception 'Thread owner and subject cannot be changed'; end if;
+ if (new.is_pinned is distinct from old.is_pinned or new.is_locked is distinct from old.is_locked) and auth.uid() is not null and not public.moderates_subject(old.subject_id) then raise exception 'Only the subject teacher or an admin can pin or lock topics'; end if;
+ return new; end $$;
+drop trigger if exists guard_thread_trg on public.discussion_threads;
+create trigger guard_thread_trg before update on public.discussion_threads for each row execute function public.guard_thread();
+
+drop policy if exists "posts read" on public.discussion_posts; drop policy if exists "posts insert" on public.discussion_posts; drop policy if exists "posts delete" on public.discussion_posts;
+create policy "posts read" on public.discussion_posts for select to authenticated using(exists(select 1 from public.discussion_threads t where t.id=thread_id));
+create policy "posts insert" on public.discussion_posts for insert to authenticated with check(author_id=auth.uid() and exists(select 1 from public.discussion_threads t where t.id=thread_id and (t.is_locked=false or public.moderates_subject(t.subject_id))));
+create policy "posts delete" on public.discussion_posts for delete to authenticated using(author_id=auth.uid() or exists(select 1 from public.discussion_threads t where t.id=thread_id and public.moderates_subject(t.subject_id)));
+
+-- keep "last activity" fresh so busy topics rise to the top of the forum
+create or replace function public.bump_thread() returns trigger language plpgsql security definer set search_path=public as $$
+begin update public.discussion_threads set last_activity_at=now() where id=new.thread_id; return new; end $$;
+drop trigger if exists bump_thread_trg on public.discussion_posts;
+create trigger bump_thread_trg after insert on public.discussion_posts for each row execute function public.bump_thread();
+
+-- realtime: new posts and class status changes appear without refreshing
+alter table public.discussion_posts replica identity full;
+alter table public.live_classes replica identity full;
+do $$ declare t text; begin
+ if exists(select 1 from pg_publication where pubname='supabase_realtime') then
+  foreach t in array array['live_classes','discussion_posts','discussion_threads'] loop
+   if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename=t) then
+    execute format('alter publication supabase_realtime add table public.%I',t);
+   end if;
+  end loop;
+ end if;
+end $$;
+
+-- make the API see the new/changed columns immediately (fixes "...in the schema cache" errors)
+notify pgrst, 'reload schema';
+select 'ModernEduMedia schema v5 is ready' as status;

@@ -1,22 +1,21 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ModernEduMedia — Advanced Learning Portal</title><meta name="description" content="Notes, assignments, auto-graded quizzes, blogs, reports and complete school management.">
-<link rel="stylesheet" href="assets/css/style.css"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-icon">🎓</span> ModernEduMedia</a>
-<nav class="main-nav" id="mainNav"><a href="index.html">Home</a><a href="resources.html">Resources</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a>
-<a href="login.html" id="navLogin">Login</a><a href="register.html" id="navRegister" class="btn btn-primary">Register</a>
-<a href="dashboard.html" id="navDashboard" class="btn btn-secondary hidden">Dashboard</a><button id="navLogout" class="btn btn-ghost hidden">Sign out</button></nav>
-<button class="menu-toggle" id="menuToggle">☰</button></div></header>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b6e69"><title>ModernEduMedia — Advanced Learning Portal</title><meta name="description" content="Notes, assignments, auto-graded quizzes, live classes, discussion forums, blogs and complete school management."><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🎓%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="assets/css/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
+<body data-page="home">
+<header id="siteHeader"></header>
+<main id="main">
 <section class="hero"><div class="container hero-grid"><div><span class="pill">Mathematics &amp; Computer Studies · Form 1–4</span>
-<h1>Notes, assignments and quizzes your class can actually use.</h1>
-<p>Download revision notes, submit assignments, sit auto-marked quizzes and see your results in one place. Teachers upload and edit their own materials; admins keep the whole school in order.</p>
-<div class="hero-actions"><a class="btn btn-secondary" href="register.html">Create account</a><a class="btn btn-outline-light" href="resources.html">Browse resources</a><a class="btn btn-whatsapp" href="https://wa.me/254741637904" target="_blank">WhatsApp support</a></div></div>
+<h1>Notes, assignments, quizzes and live classes your school can actually use.</h1>
+<p>Download revision notes, submit assignments, sit auto-marked quizzes, join live video lessons and talk things through in class forums. Teachers upload and edit their own materials; admins keep the whole school in order.</p>
+<div class="hero-actions"><a class="btn btn-secondary" href="register.html">Create account</a><a class="btn btn-outline-light" href="live.html">Join a live class</a><a class="btn btn-outline-light" href="resources.html">Browse resources</a><a class="btn btn-whatsapp" href="https://wa.me/254741637904" target="_blank" rel="noopener">WhatsApp support</a></div></div>
 <div class="worksheet" aria-hidden="true"><b>Quiz 3 · Form 3 Mathematics</b><br>Solve x² − 5x + 6 = 0<br><span class="tick">✓</span> (x − 2)(x − 3) = 0<br><span class="tick">✓</span> x = 2 or x = 3<code>score: 8/10 · marked instantly</code></div></div></section>
-<section class="section"><div class="container"><div class="grid grid-4">
-<div class="card feature"><div class="icon">📚</div><h3>Class-Based Learning</h3><p>Students see notes, assignments and quizzes only for enrolled class subjects.</p></div>
-<div class="card feature"><div class="icon">📎</div><h3>Secure Uploads</h3><p>Teachers upload PDFs, documents, images and attachments to Supabase Storage.</p></div>
-<div class="card feature"><div class="icon">✅</div><h3>Automatic Grading</h3><p>Multiple-choice, true/false and short-answer questions are graded instantly.</p></div>
-<div class="card feature"><div class="icon">🛡️</div><h3>Full Admin Control</h3><p>Admins can create, view, update and delete users, classes, subjects and content.</p></div></div></div></section>
+<section class="section"><div class="container"><div class="grid grid-3">
+<div class="card feature"><div class="icon">📚</div><h3>Class-Based Learning</h3><p>Students see notes, assignments and quizzes only for the subjects they are enrolled in.</p></div>
+<div class="card feature"><div class="icon">🎥</div><h3>Live Classes</h3><p>Teachers schedule video lessons; students join with one click, ask questions in the class chat and can find the recording afterwards.</p></div>
+<div class="card feature"><div class="icon">💬</div><h3>Discussion Forums</h3><p>Every subject has its own forum for questions, revision tips and announcements, moderated by the subject teacher.</p></div>
+<div class="card feature"><div class="icon">✅</div><h3>Automatic Grading</h3><p>Multiple-choice, true/false and short-answer questions are marked instantly, with timed quizzes and limited attempts.</p></div>
+<div class="card feature"><div class="icon">📎</div><h3>Secure Uploads</h3><p>PDFs, documents, images and attachments are stored safely and shared only with the right class.</p></div>
+<div class="card feature"><div class="icon">🛡️</div><h3>Full Admin Control</h3><p>Admins can create, edit and delete users, classes, subjects, live sessions and content.</p></div></div></div></section>
+<section class="band"><div class="container band-inner"><div><span class="pill">New</span><h2>Learn together, live.</h2><p>Open the Live Classes tab to see what is on today, join a lesson in your browser and keep the conversation going in the forum afterwards.</p></div><a class="btn btn-secondary" href="live.html">Open Live Classes</a></div></section>
 <section class="section alt"><div class="container"><div class="section-head"><div><h2>Latest articles</h2><p>Study skills, technology and classroom updates.</p></div><a class="btn btn-outline" href="blog.html">View all</a></div><div class="grid grid-3" id="latestBlogs"></div></div></section>
-<footer class="site-footer"><div class="container footer-grid"><div><h3>ModernEduMedia</h3><p>A complete educational media and learning management platform.</p></div><div><h4>Explore</h4><a href="resources.html">Resources</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a></div><div><h4>Contact</h4><a href="mailto:castrootienocommercial@gmail.com">castrootienocommercial@gmail.com</a><a href="https://wa.me/254741637904">WhatsApp: +254 741 637 904</a></div></div><p class="copyright">© <span id="year"></span> ModernEduMedia</p></footer>
-<div id="toast" class="toast"></div><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/home.js"></script></body></html>
+</main>
+<footer id="siteFooter"></footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/home.js"></script></body></html>
