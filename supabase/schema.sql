@@ -182,3 +182,22 @@ create policy "progress own" on public.progress for all to authenticated using(a
 -- students could not upload assignment files before (storage allowed teachers only)
 drop policy if exists "storage teacher upload" on storage.objects;
 create policy "storage teacher upload" on storage.objects for insert to authenticated with check(bucket_id='learning-materials' and (public.is_teacher() or name like 'assignments/%'));
+
+-- ===== v4 repair: foreign-key errors on submissions / quiz attempts (safe to re-run) =====
+-- Older databases can carry foreign keys that point at the wrong table or at rows that no longer exist.
+-- 1. Make sure every signed-up user has a profile row
+insert into public.profiles(id,email,full_name,role)
+select u.id,u.email,coalesce(u.raw_user_meta_data->>'full_name',''),'student' from auth.users u
+where not exists(select 1 from public.profiles p where p.id=u.id);
+-- 2. Remove orphaned rows (they point at deleted assignments, quizzes or users and would block the repair)
+delete from public.submissions where assignment_id not in (select id from public.assignments) or student_id not in (select id from public.profiles);
+delete from public.quiz_attempts where quiz_id not in (select id from public.quizzes) or student_id not in (select id from public.profiles);
+-- 3. Re-create the keys so they point at the right tables
+alter table public.submissions drop constraint if exists submissions_assignment_id_fkey;
+alter table public.submissions add constraint submissions_assignment_id_fkey foreign key(assignment_id) references public.assignments(id) on delete cascade;
+alter table public.submissions drop constraint if exists submissions_student_id_fkey;
+alter table public.submissions add constraint submissions_student_id_fkey foreign key(student_id) references public.profiles(id) on delete cascade;
+alter table public.quiz_attempts drop constraint if exists quiz_attempts_quiz_id_fkey;
+alter table public.quiz_attempts add constraint quiz_attempts_quiz_id_fkey foreign key(quiz_id) references public.quizzes(id) on delete cascade;
+alter table public.quiz_attempts drop constraint if exists quiz_attempts_student_id_fkey;
+alter table public.quiz_attempts add constraint quiz_attempts_student_id_fkey foreign key(student_id) references public.profiles(id) on delete cascade;
