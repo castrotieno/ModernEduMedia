@@ -1,7 +1,8 @@
 -- =============================================================
--- ModernEduMedia PRO — SAFE UPGRADE MIGRATION
--- Run this in Supabase SQL Editor over your existing database.
--- It will not fail if tables, types, columns or policies exist.
+-- ModernEduMedia PRO — SAFE UPGRADE MIGRATION v2
+-- Fixes: column "description" of relation "classes" does not exist
+-- Run the entire script in Supabase SQL Editor.
+-- Safe to run multiple times.
 -- =============================================================
 
 create extension if not exists "pgcrypto";
@@ -12,24 +13,37 @@ begin
   if not exists (select 1 from pg_type where typname='user_role') then
     create type public.user_role as enum ('admin','teacher','student','guest');
   end if;
+
   if not exists (select 1 from pg_type where typname='resource_type') then
     create type public.resource_type as enum ('notes_pdf','video_link','document','image','attachment');
   else
-    alter type public.resource_type add value if not exists 'image';
-    alter type public.resource_type add value if not exists 'attachment';
+    begin
+      alter type public.resource_type add value if not exists 'image';
+      alter type public.resource_type add value if not exists 'attachment';
+    exception when others then null;
+    end;
   end if;
+
   if not exists (select 1 from pg_type where typname='assessment_type') then
     create type public.assessment_type as enum ('Assignment','CAT','Exam','Quiz');
   else
-    alter type public.assessment_type add value if not exists 'Quiz';
+    begin
+      alter type public.assessment_type add value if not exists 'Quiz';
+    exception when others then null;
+    end;
   end if;
+
   if not exists (select 1 from pg_type where typname='question_type') then
     create type public.question_type as enum ('multiple_choice','short_answer','true_false','structured');
   end if;
+
   if not exists (select 1 from pg_type where typname='submission_status') then
     create type public.submission_status as enum ('pending','graded','auto_graded');
   else
-    alter type public.submission_status add value if not exists 'auto_graded';
+    begin
+      alter type public.submission_status add value if not exists 'auto_graded';
+    exception when others then null;
+    end;
   end if;
 end $$;
 
@@ -47,7 +61,6 @@ create table if not exists public.classes (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   academic_year text not null,
-  description text,
   created_at timestamptz default now()
 );
 
@@ -56,8 +69,6 @@ create table if not exists public.subjects (
   code text unique not null,
   name text not null,
   class_id uuid references public.classes(id) on delete cascade,
-  teacher_id uuid references public.profiles(id) on delete set null,
-  description text,
   created_at timestamptz default now()
 );
 
@@ -76,12 +87,8 @@ create table if not exists public.resources (
   description text default '',
   type public.resource_type default 'document',
   file_url text not null,
-  storage_path text,
-  file_name text,
-  file_size bigint,
   subject_id uuid references public.subjects(id) on delete cascade,
   uploaded_by uuid references public.profiles(id) on delete cascade,
-  download_count integer default 0,
   created_at timestamptz default now()
 );
 
@@ -93,7 +100,6 @@ create table if not exists public.assignments (
   subject_id uuid references public.subjects(id) on delete cascade,
   max_score numeric default 100,
   due_date timestamptz,
-  attachment_url text,
   created_by uuid references public.profiles(id) on delete cascade,
   created_at timestamptz default now()
 );
@@ -177,37 +183,69 @@ create table if not exists public.contact_messages (
 -- ---------- SAFE COLUMN UPGRADES ----------
 do $$
 begin
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='class_id') then
+  -- profiles
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='profiles' and column_name='class_id') then
     alter table public.profiles add column class_id uuid references public.classes(id) on delete set null;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='admission_no') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='profiles' and column_name='admission_no') then
     alter table public.profiles add column admission_no text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='phone') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='profiles' and column_name='phone') then
     alter table public.profiles add column phone text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='subjects' and column_name='teacher_id') then
+
+  -- classes: THIS FIXES THE ERROR
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='classes' and column_name='description') then
+    alter table public.classes add column description text;
+  end if;
+
+  -- subjects
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='subjects' and column_name='teacher_id') then
     alter table public.subjects add column teacher_id uuid references public.profiles(id) on delete set null;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='subjects' and column_name='description') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='subjects' and column_name='description') then
     alter table public.subjects add column description text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='storage_path') then
+
+  -- resources
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='resources' and column_name='storage_path') then
     alter table public.resources add column storage_path text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='file_name') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='resources' and column_name='file_name') then
     alter table public.resources add column file_name text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='file_size') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='resources' and column_name='file_size') then
     alter table public.resources add column file_size bigint;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='resources' and column_name='download_count') then
+
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='resources' and column_name='download_count') then
     alter table public.resources add column download_count integer default 0;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='assignments' and column_name='attachment_url') then
+
+  -- assignments
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='assignments' and column_name='attachment_url') then
     alter table public.assignments add column attachment_url text;
   end if;
-  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='submissions' and column_name='text_answer') then
+
+  -- submissions
+  if not exists (select 1 from information_schema.columns
+    where table_schema='public' and table_name='submissions' and column_name='text_answer') then
     alter table public.submissions add column text_answer text;
   end if;
 end $$;
@@ -291,8 +329,6 @@ drop policy if exists "enrollments student insert" on public.enrollments;
 drop policy if exists "enrollments student delete" on public.enrollments;
 drop policy if exists "enrollments admin all" on public.enrollments;
 drop policy if exists "read enrollments" on public.enrollments;
-drop policy if exists "student enroll" on public.student_subject_enrollments;
-drop policy if exists "student withdraw" on public.student_subject_enrollments;
 create policy "enrollments read" on public.enrollments for select using (auth.uid()=student_id or public.is_teacher());
 create policy "enrollments student insert" on public.enrollments for insert to authenticated with check (auth.uid()=student_id);
 create policy "enrollments student delete" on public.enrollments for delete to authenticated using (auth.uid()=student_id or public.is_admin());
