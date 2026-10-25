@@ -1,54 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ModernEduMedia — Advanced Learning & School Management Portal</title>
-<meta name="description" content="Notes, video lessons, assignments, quizzes with automatic grading, blogs, reports and school administration.">
-<link rel="stylesheet" href="assets/css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<header class="site-header"><div class="container header-inner">
-<a class="brand" href="index.html"><span class="brand-icon">🎓</span> ModernEduMedia</a>
-<nav class="main-nav" id="mainNav">
-<a href="index.html">Home</a><a href="resources.html">Notes & Resources</a><a href="blog.html">Blog</a>
-<a href="about.html">About Me</a><a href="contact.html">Contact</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ModernEduMedia — Advanced Learning Portal</title><meta name="description" content="Notes, assignments, auto-graded quizzes, blogs, reports and complete school management.">
+<link rel="stylesheet" href="assets/css/style.css"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-icon">🎓</span> ModernEduMedia</a>
+<nav class="main-nav" id="mainNav"><a href="index.html">Home</a><a href="resources.html">Resources</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a>
 <a href="login.html" id="navLogin">Login</a><a href="register.html" id="navRegister" class="btn btn-primary">Register</a>
-<a href="dashboard.html" id="navDashboard" class="btn btn-secondary hidden">Dashboard</a>
-<button id="navLogout" class="btn btn-ghost hidden">Sign out</button>
-</nav>
+<a href="dashboard.html" id="navDashboard" class="btn btn-secondary hidden">Dashboard</a><button id="navLogout" class="btn btn-ghost hidden">Sign out</button></nav>
 <button class="menu-toggle" id="menuToggle">☰</button></div></header>
-
-<section class="hero"><div class="container">
-<span class="pill">Advanced Interactive LMS</span>
-<h1>Modern learning with notes, quizzes, automatic grading and complete school management.</h1>
-<p>Students access only the subjects they enroll in. Teachers upload files, build assignments and auto-graded quizzes. Administrators manage the entire institution.</p>
-<div class="hero-actions">
-<a class="btn btn-light" href="register.html">Create account</a>
-<a class="btn btn-outline-light" href="resources.html">Explore resources</a>
-<a class="btn btn-whatsapp" href="https://wa.me/254741637904" target="_blank">WhatsApp Support</a></div></div></section>
-
+<section class="hero"><div class="container"><span class="pill">Advanced Interactive LMS</span>
+<h1>Modern learning with notes, assignments, automatic grading and complete school management.</h1>
+<p>Students access only their enrolled subjects. Teachers upload resources and build auto-graded quizzes. Admins manage the entire institution.</p>
+<div class="hero-actions"><a class="btn btn-light" href="register.html">Create account</a><a class="btn btn-outline-light" href="resources.html">Explore resources</a><a class="btn btn-whatsapp" href="https://wa.me/254741637904" target="_blank">WhatsApp Support</a></div></div></section>
 <section class="section"><div class="container"><div class="grid grid-4">
-<div class="card feature"><div class="icon">📚</div><h3>Class-Based Learning</h3><p>Students see notes, assignments and quizzes only for their enrolled class subjects.</p></div>
-<div class="card feature"><div class="icon">📎</div><h3>File Uploads</h3><p>Teachers upload PDFs, documents, images and attachments directly to secure Supabase Storage.</p></div>
-<div class="card feature"><div class="icon">✅</div><h3>Automatic Grading</h3><p>Multiple-choice and short-answer questions are graded instantly with detailed results.</p></div>
-<div class="card feature"><div class="icon">📊</div><h3>Full Administration</h3><p>Admins manage users, classes, subjects, enrollments, content, reports and site settings.</p></div></div></div></section>
-
-<section class="section alt"><div class="container">
-<div class="section-head"><div><h2>Latest educational articles</h2><p>Study skills, technology guides and classroom updates.</p></div>
-<a class="btn btn-outline" href="blog.html">View all</a></div>
-<div class="grid grid-3" id="latestBlogs"></div></div></section>
-
-<section class="section"><div class="container"><div class="card cta-card">
-<h2>Start learning smarter today</h2><p>Create an account, enroll in your class subjects and access personalized learning materials.</p>
-<div class="hero-actions"><a class="btn btn-light" href="register.html">Get started</a><a class="btn btn-outline" href="contact.html">Contact us</a></div></div></div></section>
-
-<footer class="site-footer"><div class="container footer-grid">
-<div><h3>ModernEduMedia</h3><p>A complete educational media and learning management platform.</p></div>
-<div><h4>Explore</h4><a href="resources.html">Notes & Resources</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a></div>
-<div><h4>Contact</h4><a href="mailto:castrootienocommercial@gmail.com">castrootienocommercial@gmail.com</a><a href="https://wa.me/254741637904">WhatsApp: +254 741 637 904</a></div></div>
-<p class="copyright">© <span id="year"></span> ModernEduMedia</p></footer>
-<div id="toast" class="toast"></div>
-<script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/home.js"></script>
-</body></html>
+<div class="card feature"><div class="icon">📚</div><h3>Class-Based Learning</h3><p>Students see notes, assignments and quizzes only for enrolled class subjects.</p></div>
+<div class="card feature"><div class="icon">📎</div><h3>Secure Uploads</h3><p>Teachers upload PDFs, documents, images and attachments to Supabase Storage.</p></div>
+<div class="card feature"><div class="icon">✅</div><h3>Automatic Grading</h3><p>Multiple-choice, true/false and short-answer questions are graded instantly.</p></div>
+<div class="card feature"><div class="icon">🛡️</div><h3>Full Admin Control</h3><p>Admins can create, view, update and delete users, classes, subjects and content.</p></div></div></div></section>
+<section class="section alt"><div class="container"><div class="section-head"><div><h2>Latest articles</h2><p>Study skills, technology and classroom updates.</p></div><a class="btn btn-outline" href="blog.html">View all</a></div><div class="grid grid-3" id="latestBlogs"></div></div></section>
+<footer class="site-footer"><div class="container footer-grid"><div><h3>ModernEduMedia</h3><p>A complete educational media and learning management platform.</p></div><div><h4>Explore</h4><a href="resources.html">Resources</a><a href="blog.html">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a></div><div><h4>Contact</h4><a href="mailto:castrootienocommercial@gmail.com">castrootienocommercial@gmail.com</a><a href="https://wa.me/254741637904">WhatsApp: +254 741 637 904</a></div></div><p class="copyright">© <span id="year"></span> ModernEduMedia</p></footer>
+<div id="toast" class="toast"></div><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/home.js"></script></body></html>
