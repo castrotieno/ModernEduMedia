@@ -1,3 +1,7 @@
-(async()=>{const slug=new URLSearchParams(location.search).get("slug");const {data}=await sb.from("blogs").select("*").eq("slug",slug).eq("is_published",true).maybeSingle();
-const box=document.getElementById("article");if(!data){box.innerHTML="<h1>Article not found</h1>";return}
-document.title=data.title+" — ModernEduMedia";box.innerHTML=`<span class="pill">${esc(data.category||"Education")}</span><h1>${esc(data.title)}</h1><p class="muted">${fmtDate(data.created_at)}</p><div>${data.content.replace(/\n/g,"<br>")}</div>`})();
+(async()=>{const slug=new URLSearchParams(location.search).get("slug");const {data}=await sb.from("blogs").select("*,profiles(full_name)").eq("slug",slug).maybeSingle();const box=document.getElementById("article");
+if(!data){box.innerHTML='<h1>Article not found</h1><p class="muted">It may have been unpublished or moved.</p><a class="btn btn-primary" href="blog.html">Back to the blog</a>';return}
+document.title=data.title+" — ModernEduMedia";const mins=Math.max(1,Math.round(data.content.split(/\s+/).length/200));
+const body=data.content.split(/\n\s*\n/).map(p=>`<p>${esc(p.trim()).replace(/\n/g,"<br>")}</p>`).join("");
+const url=encodeURIComponent(location.href);
+box.innerHTML=`<span class="pill">${esc(data.category||"Education")}</span><h1>${esc(data.title)}</h1><div class="meta">${data.profiles?.full_name?esc(data.profiles.full_name)+" · ":""}${fmtDate(data.created_at)} · ${mins} min read</div>${data.cover_image?`<img src="${esc(data.cover_image)}" alt="" style="width:100%;border-radius:10px;margin-bottom:28px">`:""}${body}<div class="share"><a class="btn btn-whatsapp btn-sm" target="_blank" href="https://wa.me/?text=${encodeURIComponent(data.title)}%20${url}">Share on WhatsApp</a><a class="btn btn-outline btn-sm" href="blog.html">All articles</a></div>`;
+const p=await getProfile();if(p&&(p.role==="admin"||p.id===data.author_id))box.insertAdjacentHTML("afterbegin",'<a class="btn btn-edit btn-sm" style="float:right" href="dashboard.html">Edit in dashboard</a>')})();

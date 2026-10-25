@@ -16,3 +16,7 @@ O?.addEventListener("click",async()=>{await sb.auth.signOut();location.href="ind
 document.getElementById("menuToggle")?.addEventListener("click",()=>document.getElementById("mainNav")?.classList.toggle("open"));
 const y=document.getElementById("year");if(y)y.textContent=new Date().getFullYear()}
 document.addEventListener("DOMContentLoaded",initHeader);
+
+const mins=t=>Math.max(1,Math.round((t||"").split(/\s+/).length/200));
+window.blogCard=(p,big)=>`<a href="blog-post.html?slug=${encodeURIComponent(p.slug)}" ${big?'style="grid-column:1/-1"':""}><div class="card post ${big?"big":""}"><div class="cover" ${p.cover_image?`style="background-image:url('${esc(p.cover_image)}')"`:""}>${p.cover_image?"":"📖"}</div><div class="body"><span class="pill">${esc(p.category||"Education")}</span><h3>${esc(p.title)}</h3><p>${esc(p.content.slice(0,big?260:150))}…</p><div class="meta">${fmtDate(p.created_at)} · ${mins(p.content)} min read</div></div></div></a>`;
+(async()=>{try{const {data}=await sb.from("site_settings").select("value").eq("key","announcement").maybeSingle();const t=data?.value?.trim();if(t&&!document.querySelector(".dashboard"))document.body.insertAdjacentHTML("afterbegin",`<div class="announce">${esc(t)}</div>`)}catch(e){}})();

@@ -2,6 +2,7 @@
 const lf=document.getElementById("loginForm");lf?.addEventListener("submit",async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form);
 const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error)return showToast(error.message,"error");location.href="dashboard.html"});
 const rf=document.getElementById("registerForm");rf?.addEventListener("submit",async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form);
-const {data,error}=await sb.auth.signUp({email:f.get("email"),password:f.get("password")});if(error)return showToast(error.message,"error");
-if(data.user)await sb.from("profiles").upsert({id:data.user.id,email:f.get("email"),full_name:f.get("full_name"),role:f.get("role"),class_id:f.get("class_id")||null});
-showToast("Account created.");setTimeout(()=>location.href="dashboard.html",1200)});
+const wantsTeacher=f.get("role")==="teacher";
+const {data,error}=await sb.auth.signUp({email:f.get("email"),password:f.get("password"),options:{data:{full_name:f.get("full_name"),role:f.get("role"),class_id:f.get("class_id")||null}}});if(error)return showToast(error.message,"error");
+if(data.session&&data.user)await sb.from("profiles").upsert({id:data.user.id,email:f.get("email"),full_name:f.get("full_name"),role:"student",class_id:f.get("class_id")||null},{onConflict:"id",ignoreDuplicates:true});
+showToast(wantsTeacher?"Account created. An admin will approve your teacher access.":"Account created.");setTimeout(()=>location.href=data.session?"dashboard.html":"login.html",1600)});

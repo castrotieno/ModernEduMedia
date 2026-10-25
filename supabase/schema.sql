@@ -138,3 +138,24 @@ create policy "storage teacher delete" on storage.objects for delete to authenti
 
 insert into public.classes(name,academic_year,description) values('Form 1','2026','Junior secondary class'),('Form 2','2026','Intermediate secondary class'),('Form 3','2026','Senior secondary class'),('Form 4','2026','Final secondary class') on conflict do nothing;
 insert into public.site_settings(key,value) values('contact_email','castrootienocommercial@gmail.com'),('whatsapp_number','+254741637904'),('announcement','Welcome to ModernEduMedia.') on conflict(key) do update set value=excluded.value,updated_at=now();
+
+-- ===== v2 upgrade: security + editing support (safe to re-run) =====
+-- 1. Stop users promoting themselves: only admins (or the Supabase dashboard) may change roles
+create or replace function public.guard_role() returns trigger language plpgsql security definer set search_path=public as $$
+begin if new.role is distinct from old.role and auth.uid() is not null and not public.is_admin() then raise exception 'Only admins can change roles'; end if; return new; end $$;
+drop trigger if exists guard_role_trg on public.profiles;
+create trigger guard_role_trg before update on public.profiles for each row execute function public.guard_role();
+drop policy if exists "profiles self insert" on public.profiles;
+create policy "profiles self insert" on public.profiles for insert to authenticated with check(auth.uid()=id and role in ('student','guest'));
+-- 2. Create the profile automatically at sign-up (teacher requests start as guest until an admin approves)
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$
+begin insert into public.profiles(id,email,full_name,role,class_id) values(new.id,new.email,coalesce(new.raw_user_meta_data->>'full_name',''),
+ case when new.raw_user_meta_data->>'role'='student' then 'student'::public.user_role else 'guest'::public.user_role end,
+ nullif(new.raw_user_meta_data->>'class_id','')::uuid) on conflict(id) do nothing; return new; end $$;
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
+-- 3. Admin can delete users and manage the contact inbox
+drop policy if exists "profiles admin delete" on public.profiles;
+create policy "profiles admin delete" on public.profiles for delete to authenticated using(public.is_admin());
+drop policy if exists "contact admin delete" on public.contact_messages;
+create policy "contact admin delete" on public.contact_messages for delete to authenticated using(public.is_admin());

@@ -1,5 +1,6 @@
-let posts=[];async function load(){const {data}=await sb.from("blogs").select("*").eq("is_published",true).order("created_at",{ascending:false});posts=data||[];
-const cats=[...new Set(posts.map(p=>p.category).filter(Boolean))];document.getElementById("categoryFilter").innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");render()}
-function render(){const q=document.getElementById("blogSearch").value.toLowerCase(),c=document.getElementById("categoryFilter").value;const out=posts.filter(p=>(!q||p.title.toLowerCase().includes(q))&&(!c||p.category===c));
-document.getElementById("empty").classList.toggle("hidden",out.length>0);document.getElementById("blogGrid").innerHTML=out.map(p=>`<a href="blog-post.html?slug=${encodeURIComponent(p.slug)}"><div class="card feature"><span class="pill">${esc(p.category||"Education")}</span><h3>${esc(p.title)}</h3><p>${esc(p.content.slice(0,170))}...</p></div></a>`).join("")}
-document.getElementById("blogFilters").onsubmit=e=>{e.preventDefault();render()};document.getElementById("blogSearch").oninput=render;document.getElementById("categoryFilter").onchange=render;load();
+let posts=[];
+async function load(){const {data}=await sb.from("blogs").select("*").eq("is_published",true).order("created_at",{ascending:false});posts=data||[];
+const cats=[...new Set(posts.map(p=>p.category).filter(Boolean))];categoryFilter.innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");render()}
+function render(){const q=blogSearch.value.toLowerCase(),c=categoryFilter.value;const out=posts.filter(p=>(!q||(p.title+" "+p.content).toLowerCase().includes(q))&&(!c||p.category===c));
+empty.classList.toggle("hidden",out.length>0);blogGrid.innerHTML=out.map((p,i)=>blogCard(p,i===0&&!q&&!c&&out.length>1)).join("")}
+blogFilters.onsubmit=e=>{e.preventDefault();render()};blogSearch.oninput=render;categoryFilter.onchange=render;load();
