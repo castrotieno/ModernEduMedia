@@ -1,41 +1,43 @@
-# ModernEduMedia — GitHub Pages + Supabase
+# ModernEduMedia PRO — GitHub Pages + Supabase
 
-This is a static, GitHub Pages-ready version of ModernEduMedia. It contains a real `index.html`, plus resources, blog, about, contact, login, register and dashboard pages.
+An upgraded static learning management system with class-based enrollment, secure file uploads/downloads, assignments, auto-graded quizzes, blogs, reports and complete admin control.
 
 ## Deploy to GitHub Pages
 
-1. Create a GitHub repository, for example `modernedumedia`.
-2. Upload **all files and folders** from this project to the repository root.
+1. Create a GitHub repository.
+2. Upload every file and folder from this project to the repository **root**.
 3. Go to **Settings → Pages**.
-4. Under Source, select **Deploy from a branch**.
-5. Choose branch `main` and folder `/ (root)`.
-6. Save. Your site will be available at:
-   `https://YOUR-USERNAME.github.io/modernedumedia/`
+4. Select **Deploy from a branch**, branch `main`, folder `/ (root)`.
+5. Save. Visit: `https://YOUR-USERNAME.github.io/REPOSITORY-NAME/`
 
 ## Supabase setup
 
-1. Open your Supabase project.
-2. Go to **SQL Editor**.
-3. Copy and run the entire contents of `supabase/schema.sql`.
-4. The site is already configured to connect to your Supabase project in `assets/js/config.js`.
+1. Open Supabase → SQL Editor.
+2. Run the complete contents of `supabase/schema.sql`.
+3. The database creates classes, subjects, enrollments, resources, assignments, submissions, quizzes, questions, attempts, blogs, settings and contact messages.
+4. It also creates the public `learning-materials` storage bucket and RLS policies.
 
-## Create the first administrator
+## First admin
 
-1. Open `/register.html` and create an account.
-2. In Supabase, open **Table Editor → profiles**.
-3. Find your user and change `role` from `student` to `admin`.
-4. Refresh the site and open `/dashboard.html`.
+1. Open `register.html`, create a teacher account.
+2. In Supabase → Table Editor → `profiles`, set that account’s `role` to `admin`.
+3. Refresh and open `dashboard.html`.
 
-## Features
+## Enrollment access
 
-- Public homepage, searchable resources, categorized blog, About and Contact pages.
-- Supabase email/password authentication.
-- Student, teacher and admin dashboards.
-- Assignment/CAT submission and grading.
-- Subject enrollment and gradebook.
-- Academic setup, user-role management, reports and site settings.
-- Fully responsive mobile-friendly design.
+Students can enroll only in subjects belonging to their selected class. Resources, assignments and quizzes are visible only after enrollment, enforced through the `can_access_subject()` RLS function.
 
-## Important
+## Automatic grading
 
-The Supabase publishable/anon key is safe for browser use only because Row Level Security is enabled. Never put a service-role key in this static website.
+Quiz builder supports:
+
+- Multiple choice
+- True / false
+- Short answer
+- Structured / teacher-graded questions
+
+MCQ, true/false and exact short answers are marked automatically. Structured responses are saved for teacher review.
+
+## Security
+
+The publishable Supabase key is browser-safe only because Row Level Security is enabled. Never place a service-role key in this static website.

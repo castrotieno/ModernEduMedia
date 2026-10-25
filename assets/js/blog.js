@@ -1,29 +1,5 @@
-let posts = [];
-async function loadBlogs() {
-  const { data } = await sb.from("blogs").select("*").eq("is_published", true).order("created_at", { ascending: false });
-  posts = data || [];
-  const categories = [...new Set(posts.map(p => p.category).filter(Boolean))];
-  document.getElementById("categoryFilter").innerHTML =
-    `<option value="">All categories</option>` + categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-  renderPosts();
-}
-function renderPosts() {
-  const q = document.getElementById("blogSearch").value.toLowerCase();
-  const category = document.getElementById("categoryFilter").value;
-  const filtered = posts.filter(p =>
-    (!q || p.title.toLowerCase().includes(q)) && (!category || p.category === category)
-  );
-  document.getElementById("blogEmpty").classList.toggle("hidden", filtered.length > 0);
-  document.getElementById("blogGrid").innerHTML = filtered.map(p => `
-    <a href="blog-post.html?slug=${encodeURIComponent(p.slug)}">
-      <div class="card feature">
-        <span class="pill" style="background:#eef2ff;color:#4338ca">${escapeHtml(p.category || "Education")}</span>
-        <h3>${escapeHtml(p.title)}</h3>
-        <p>${escapeHtml(p.content.slice(0, 170))}...</p>
-      </div>
-    </a>`).join("");
-}
-document.getElementById("blogFilters").addEventListener("submit", e => { e.preventDefault(); renderPosts(); });
-document.getElementById("blogSearch").addEventListener("input", renderPosts);
-document.getElementById("categoryFilter").addEventListener("change", renderPosts);
-loadBlogs();
+let posts=[];async function load(){const {data}=await sb.from("blogs").select("*").eq("is_published",true).order("created_at",{ascending:false});posts=data||[];
+const cats=[...new Set(posts.map(p=>p.category).filter(Boolean))];document.getElementById("categoryFilter").innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");render()}
+function render(){const q=document.getElementById("blogSearch").value.toLowerCase(),c=document.getElementById("categoryFilter").value;const out=posts.filter(p=>(!q||p.title.toLowerCase().includes(q))&&(!c||p.category===c));
+document.getElementById("empty").classList.toggle("hidden",out.length>0);document.getElementById("blogGrid").innerHTML=out.map(p=>`<a href="blog-post.html?slug=${encodeURIComponent(p.slug)}"><div class="card feature"><span class="pill">${esc(p.category||"Education")}</span><h3>${esc(p.title)}</h3><p>${esc(p.content.slice(0,170))}...</p></div></a>`).join("")}
+document.getElementById("blogFilters").onsubmit=e=>{e.preventDefault();render()};document.getElementById("blogSearch").oninput=render;document.getElementById("categoryFilter").onchange=render;load();

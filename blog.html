@@ -1,41 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Educational Blog — ModernEduMedia</title>
-<link rel="stylesheet" href="assets/css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="index.html" class="brand"><span class="brand-icon">🎓</span> ModernEduMedia</a>
-    <nav class="main-nav" id="mainNav">
-      <a href="index.html">Home</a><a href="resources.html">Notes & Resources</a>
-      <a href="blog.html" class="active">Blog</a><a href="about.html">About Me</a><a href="contact.html">Contact</a>
-      <a href="login.html" class="nav-auth">Login</a>
-    </nav>
-    <button class="menu-toggle" id="menuToggle">☰</button>
-  </div>
-</header>
-<main class="section">
-  <div class="container">
-    <h1>Educational Blog</h1>
-    <p class="muted">Read practical guides on studying, technology and academic success.</p>
-    <form class="filter-bar" id="blogFilters">
-      <input type="search" id="blogSearch" placeholder="Search articles...">
-      <select id="categoryFilter"><option value="">All categories</option></select>
-      <button class="btn btn-primary">Search</button>
-    </form>
-    <div class="grid grid-3" id="blogGrid"></div>
-    <div id="blogEmpty" class="card empty hidden">No published articles found.</div>
-  </div>
-</main>
-<footer class="site-footer"><div class="container"><p>© ModernEduMedia</p></div></footer>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blog — ModernEduMedia</title><link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-icon">🎓</span> ModernEduMedia</a>
+<nav class="main-nav"><a href="index.html">Home</a><a href="resources.html">Resources</a><a href="blog.html" class="active">Blog</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="login.html">Login</a></nav></div></header>
+<main class="section"><div class="container"><h1>Educational Blog</h1>
+<form class="filter-bar" id="blogFilters"><input id="blogSearch" placeholder="Search articles..."><select id="categoryFilter"><option value="">All categories</option></select><button class="btn btn-primary">Search</button></form>
+<div class="grid grid-3" id="blogGrid"></div><div id="empty" class="card empty hidden">No articles found.</div></div></main>
 <div id="toast" class="toast"></div>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/blog.js"></script>
-</body>
-</html>
+<script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/blog.js"></script></body></html>
