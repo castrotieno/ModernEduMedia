@@ -24,6 +24,15 @@ Admins can delete:
 
 Each management table includes a red **Delete** button with confirmation.
 
+## v3 changes
+
+- **Attempts per quiz:** teachers set "Attempts allowed" when creating a quiz and can change it later with Edit. The limit is enforced in the database as well as the browser. Students see "2 of 3 attempts used" and a Retake button; the best score is shown.
+- **Marked as done:** students mark notes as done; assignments become "Submitted" automatically and quizzes "Done" after a first attempt. The overview shows overall progress and the next deadlines.
+- **Timed quizzes** count down and auto-submit, then show a review with correct answers and explanations.
+- Teachers can edit, delete and add quiz questions from **My Content → Questions**.
+- Fixed: students could not upload files to assignments (storage only allowed teachers). Overdue assignments are flagged and graded work is locked.
+- **Re-run `supabase/schema.sql`** (it adds attempt numbers, the progress table and the upload fix) before using v3.
+
 ## v2 changes
 
 - New look: chalk-and-graph-paper identity, Bricolage Grotesque + Figtree, restyled dashboards, tables and forms.

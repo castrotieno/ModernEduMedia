@@ -159,3 +159,26 @@ drop policy if exists "profiles admin delete" on public.profiles;
 create policy "profiles admin delete" on public.profiles for delete to authenticated using(public.is_admin());
 drop policy if exists "contact admin delete" on public.contact_messages;
 create policy "contact admin delete" on public.contact_messages for delete to authenticated using(public.is_admin());
+
+-- ===== v3 upgrade: quiz attempt limits, "mark as done", student uploads (safe to re-run) =====
+alter table public.quizzes alter column max_attempts set default 1;
+update public.quizzes set max_attempts=1 where max_attempts is null;
+alter table public.quiz_attempts add column if not exists attempt_no integer default 1;
+alter table public.quiz_attempts drop constraint if exists quiz_attempts_quiz_id_student_id_key;
+create unique index if not exists quiz_attempts_unique_attempt on public.quiz_attempts(quiz_id,student_id,attempt_no);
+-- enforce the attempt limit on the server, not just in the browser
+create or replace function public.enforce_attempt_limit() returns trigger language plpgsql security definer set search_path=public as $$
+declare used int; lim int;
+begin select count(*) into used from public.quiz_attempts where quiz_id=new.quiz_id and student_id=new.student_id;
+ select coalesce(max_attempts,1) into lim from public.quizzes where id=new.quiz_id;
+ if used>=lim then raise exception 'No attempts left for this quiz'; end if; return new; end $$;
+drop trigger if exists attempt_limit_trg on public.quiz_attempts;
+create trigger attempt_limit_trg before insert on public.quiz_attempts for each row execute function public.enforce_attempt_limit();
+drop policy if exists "attempts student update own" on public.quiz_attempts; -- attempts are final once submitted
+create table if not exists public.progress(student_id uuid not null references public.profiles(id) on delete cascade,item_type text not null,item_id uuid not null,done_at timestamptz default now(),primary key(student_id,item_type,item_id));
+alter table public.progress enable row level security;
+drop policy if exists "progress own" on public.progress;
+create policy "progress own" on public.progress for all to authenticated using(auth.uid()=student_id) with check(auth.uid()=student_id);
+-- students could not upload assignment files before (storage allowed teachers only)
+drop policy if exists "storage teacher upload" on storage.objects;
+create policy "storage teacher upload" on storage.objects for insert to authenticated with check(bucket_id='learning-materials' and (public.is_teacher() or name like 'assignments/%'));
