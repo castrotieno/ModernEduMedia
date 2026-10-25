@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register — ModernEduMedia</title><link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
+<body>
+<header class="site-header"><div class="container header-inner"><a href="index.html" class="brand"><span class="brand-icon">🎓</span> ModernEduMedia</a></div></header>
+<main class="auth-page"><form class="card auth-card" id="registerForm">
+<h1>Create account</h1>
+<label>Full name<input name="full_name" required></label>
+<label>Email<input type="email" name="email" required></label>
+<label>Password<input type="password" name="password" minlength="8" required></label>
+<label>I am a<select name="role"><option value="student">Student</option><option value="teacher">Teacher</option></select></label>
+<button class="btn btn-primary full">Create account</button>
+<p class="muted center">Already registered? <a href="login.html">Sign in</a></p>
+</form></main>
+<div id="toast" class="toast"></div>
+<script src="assets/js/config.js"></script><script src="assets/js/app.js"></script><script src="assets/js/auth.js"></script>
+</body></html>

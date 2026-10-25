@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes & Resources — ModernEduMedia</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand"><span class="brand-icon">🎓</span> ModernEduMedia</a>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="resources.html" class="active">Notes & Resources</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About Me</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="nav-auth">Login</a>
+      <a href="dashboard.html" class="btn btn-secondary hidden" id="navDashboard">Dashboard</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+  </div>
+</header>
+
+<main class="section">
+  <div class="container">
+    <h1>Notes & Resources</h1>
+    <p class="muted">Search lesson notes, documents and video tutorials by keyword, subject or type.</p>
+
+    <form class="filter-bar" id="resourceFilters">
+      <input type="search" name="q" id="searchInput" placeholder="Search notes, videos, worksheets...">
+      <select name="subject" id="subjectFilter"><option value="">All subjects</option></select>
+      <select name="type" id="typeFilter">
+        <option value="">All types</option>
+        <option value="notes_pdf">PDF Notes</option>
+        <option value="video_link">Video Tutorials</option>
+        <option value="document">Documents</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+
+    <div class="chip-row" id="classChips"></div>
+    <div class="grid grid-3" id="resourceGrid"></div>
+    <div id="emptyState" class="card empty hidden">No resources match your search yet.</div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h3>ModernEduMedia</h3><p>Learning made organized, accessible and measurable.</p></div>
+    <div><h4>Contact</h4><a href="mailto:castrootienocommercial@gmail.com">castrootienocommercial@gmail.com</a><a href="https://wa.me/254741637904">WhatsApp Support</a></div>
+  </div>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/resources.js"></script>
+</body>
+</html>
