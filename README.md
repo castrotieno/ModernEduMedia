@@ -1,4 +1,4 @@
-# ModernEduMedia v5 — GitHub Pages + Supabase
+# ModernEduMedia v6 — GitHub Pages + Supabase
 
 A static LMS (no build step): class-based enrollment, notes and uploads, assignments, auto-graded quizzes, blogs, reports, **Live Classes** and **discussion forums**.
 
@@ -13,7 +13,20 @@ This one run:
 
 Then upload all files to your GitHub repository root (Settings → Pages → Deploy from a branch → `main` / root).
 
-## 2. What is new in v5
+## 2. What is new in v6.1 (admin reporting)
+- **Class Lists** (admin menu): students by class, or subject within a class, with admission no, phone, email and enrolled subjects. Move a student to another class from the list, enroll a whole class in a subject in one click, download CSV, print.
+- **Gradebook** (admin menu): one sheet per class and/or subject (or the whole school) showing every student against each Assignment, CAT and Exam score, plus each student's average %, quiz average % and a class-average row. Filter by type, search, download CSV, print (landscape).
+- **Report card**: click any student's name for all their graded work, feedback and quiz results; download or print.
+
+## 2a. What is new in v6
+Run the updated `supabase/schema.sql` once (it now ends with the v6 columns; `supabase/upgrade_v6.sql` is the same addition on its own).
+
+**Admin:** overview with accounts awaiting approval (one-click Teacher/Student) and latest submissions; user search, role filter and CSV export; quiz publish/unpublish; reports now include average score per assignment and exam; *Write Article* in the menu.
+**Assignments & Exams (teacher + admin):** one page to create, search, filter by type, edit, duplicate and delete; per-item *Review* screen with stats, inline grading, late flags, list of students who have not submitted, and CSV export. New options: opens-at time, exam duration, lock late submissions.
+**Students:** filter tabs (To do / Submitted / Graded / All), live "closes in" countdown, exam styling, locked/not-yet-open states, draft answers saved on the device.
+**Blog:** editor with Markdown toolbar, live preview, cover upload, summary and "featured" flag; public blog has featured article, category chips, search and load-more; article pages have a reading-progress bar, contents list, author box, copy link and related articles.
+
+## 2b. What was new in v5
 
 ### Live Classes (new tab in the navigation bar → `live.html`)
 - **Teachers** open *Live Classes → Schedule a class*: title, subject, date/time, duration, description, and a platform:

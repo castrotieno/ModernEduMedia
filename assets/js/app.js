@@ -57,8 +57,18 @@ async function initHeader(){buildHeader();buildFooter();if(!sb)return;
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initHeader);else initHeader();
 
 const mins=t=>Math.max(1,Math.round((t||"").split(/\s+/).length/200));
-window.blogCard=(p,big)=>`<a href="blog-post.html?slug=${encodeURIComponent(p.slug)}" ${big?'style="grid-column:1/-1"':""}><div class="card post ${big?"big":""}"><div class="cover" ${p.cover_image?`style="background-image:url('${esc(p.cover_image)}')"`:""}>${p.cover_image?"":"📖"}</div><div class="body"><span class="pill">${esc(p.category||"Education")}</span><h3>${esc(p.title)}</h3><p>${esc(p.content.slice(0,big?260:150))}…</p><div class="meta">${fmtDate(p.created_at)} · ${mins(p.content)} min read</div></div></div></a>`;
+window.blogCard=(p,big)=>`<a href="blog-post.html?slug=${encodeURIComponent(p.slug)}" ${big?'style="grid-column:1/-1"':""}><div class="card post ${big?"big":""}"><div class="cover" ${p.cover_image?`style="background-image:url('${esc(p.cover_image)}')"`:""}>${p.cover_image?"":"📖"}</div><div class="body"><span class="pill">${esc(p.category||"Education")}</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt||p.content.replace(/[#*>\[\]]/g,"").slice(0,big?260:150))}…</p><div class="meta">${fmtDate(p.created_at)} · ${mins(p.content)} min read</div></div></div></a>`;
 (async()=>{if(!sb)return;try{const {data}=await sb.from("site_settings").select("value").eq("key","announcement").maybeSingle();const t=data?.value?.trim();
  let gone=false;try{gone=sessionStorage.getItem("announce-off")===t}catch(e){}
  if(t&&!gone&&!document.querySelector(".dashboard")){document.body.insertAdjacentHTML("afterbegin",`<div class="announce"><span>${esc(t)}</span><button aria-label="Dismiss announcement" class="announce-x">×</button></div>`);
   document.querySelector(".announce-x").onclick=e=>{e.target.parentElement.remove();try{sessionStorage.setItem("announce-off",t)}catch(_){}}}}catch(e){}})();
+
+/* v6: safe mini-markdown (## headings, **bold**, *italic*, [link](https://..), - lists, > quotes) */
+window.md=s=>{const inl=t=>t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>").replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+ let h="",ul=false;const end=()=>{if(ul){h+="</ul>";ul=false}};
+ esc(s||"").split("\n").forEach(l=>{l=l.trim();let m;
+  if(!l)return end();
+  if(m=l.match(/^(#{2,3})\s+(.+)/)){end();h+=`<h${m[1].length} id="${slugify(m[2].replace(/&[a-z#0-9]+;/g,""))}">${inl(m[2])}</h${m[1].length}>`}
+  else if(m=l.match(/^[-*]\s+(.+)/)){if(!ul){h+="<ul>";ul=true}h+=`<li>${inl(m[1])}</li>`}
+  else if(m=l.match(/^&gt;\s?(.+)/)){end();h+=`<blockquote>${inl(m[1])}</blockquote>`}
+  else{end();h+=`<p>${inl(l)}</p>`}});end();return h};
